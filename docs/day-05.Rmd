@@ -16,7 +16,7 @@ We are going to practice some data wrangling skills using a real-world dataset a
 
 > "We are providing two sets of data with cumulative counts of coronavirus cases and deaths: one with our most current numbers for each geography and another with historical data showing the tally for each day for each geography ... the historical files are the final counts at the end of each day ... The historical and live data are released in three files, one for each of these geographic levels: U.S., states and counties."
 
-For this lab we will use the historic, country level data which is stored as an updating CSV at this URL:
+For this lab we will use the historic, county level data which is stored as an updating CSV at this URL:
 
 
 ```{r, eval = FALSE}
@@ -47,47 +47,62 @@ to print the top 5 columns of the raw covid `object`
 
 ## Question 1: 
 
-Use `dplyr` verbs to  create a data.frame of the **5** counties with the most current cases. Remember, the cases and deaths are cumulative, so you only need to deal with the data for the most current (`max`) date.
+Use `dplyr` verbs to tell create a data.frame of the **5** counties with the most cases current cases. Remember, the cases and deaths stored are cumulative, so you only need to deal with the data for the most current (`max`) date.
 
 (**Hint:** `filter`, `arrange`)
 
 ```{r}
-
+covid %>%
+  filter(date == max(date)) %>%
+  arrange(-cases) %>%
+head(covid, 5)
 ```
 
 ## Question 2: 
 
-Use `dplyr` verbs to create a data.frame of the **5** states with the _most_ cases current cases. 
+Use `dplyr` verbs to tell create a data.frame of the **5** states with the _most_ cases current cases. 
 
 (**Hint:** `filter`, `group_by`, `summarize`, `arrange`)
 
-```{r}
-
+```{r message=FALSE, warning=FALSE}
+covid %>%
+  filter(date == max(date)) %>%
+  group_by(state) %>%
+  summarize(stateTotal = sum(cases)) %>%
+  arrange(-stateTotal) %>%
+head(covid, 5)
 ```
 
 ## Question 3: 
 
-Use the `dplyr` verbs to report the **5** counties with the _worst_ current death/cases ratio: (e.g.$100* (deaths/cases)$)
+Use the `dplyr` verbs to report the  **5** counties with the _worst_ current death/cases ratio: (e.g.$100* (deaths/cases)$)
 
-(**Hint:** `filter`, `mutate`, `arrange`)
+(**Hint:** `filter`, `mutate`, `arrange`, `slice`)
 
 ```{r}
-
+covid %>% 
+  filter(date == max(date)) %>%
+  mutate(deathsCasesRatio = 100*(deaths/cases)) %>%
+  arrange(-deathsCasesRatio) %>%
+head(covid, 5)
 ```
 
 
 ## Question 4: 
 
-Use the `dplyr` verbs to report the **5** states with the _worst_ current death/case ratio.
+USe the `dplyr` verbs to report the **5** states with the worst current deaths/cases ratio.
 
 (**Hint:** `filter`, `group_by`, `summarize`, `mutate`, `arrange`)
 
 ```{r}
-
+covid %>% 
+  filter(date == max(date)) %>%
+  group_by(state) %>%
+  summarize(totalCases = sum(cases), totalDeaths =sum(deaths)) %>%
+  mutate(deathsCasesRatio = 100*(totalDeaths/totalCases)) %>%
+  arrange(-deathsCasesRatio) %>%
+head(covid, 5)
 ```
 
 
 # END
-
-
-
