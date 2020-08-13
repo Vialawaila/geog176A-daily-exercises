@@ -1,6 +1,6 @@
 #Yan Wang
 #08/12/2020
-#Daily Exercise 06
+#Daily Exercise 06: My first plots
 
 library(tidyverse)
 
@@ -70,7 +70,7 @@ covid %>%
        y = "Cases",
        caption = "Daily Exercise 06")
 
-  ggsave("Question_1.jpg")
+  ggsave(path = "img", filename = "D6_Question_1.jpg")
 
 #Question 2
 
@@ -93,5 +93,5 @@ covid %>%
        y = "Cases",
        caption = "Daily Exercise 06")
 
-ggsave("Question_2.jpg")
+ggsave(path = "img", filename = "D6_Question_2.jpg")
 
