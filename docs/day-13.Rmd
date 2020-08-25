@@ -1,0 +1,37 @@
+```{r}
+library(tidyverse)
+library(USAboundaries)
+library(sf)
+library(rmapshaper)
+conus = USAboundaries::us_states() %>%
+  filter(!state_name %in% c("Puerto Rico", "Alaska", "Hawaii")) %>% 
+  st_union() %>% 
+  st_transform(5070)
+plot(conus)
+```
+
+
+```{r}
+mapview::npts(conus)
+```
+
+
+```{r}
+stConus = st_simplify(conus, dTolerance = 25000)
+plot(stConus)
+```
+
+
+```{r}
+mapview::npts(stConus)
+```
+
+```{r}
+msConus=ms_simplify(conus, keep = .05)
+plot(msConus)
+```
+
+
+```{r}
+mapview::npts(msConus)
+```

@@ -7,7 +7,7 @@ library(sf)
 library(units)
 
 
-uscities <- read_csv("~/github/exercise-04/data/uscities.csv")
+uscities <- read_csv("~/github/exercise-04/data/uscities.csv") %>%
   filter(city %in% c("Santa Barbara", "San Francesco")) %>%
   st_as_sf(coords = c("lng", "lat"), crs = 4326)
 
