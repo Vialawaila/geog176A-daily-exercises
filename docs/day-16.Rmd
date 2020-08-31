@@ -1,0 +1,50 @@
+---
+title: "Daily Exercise 16"
+author: "Yan Wang"
+output: html_document
+---
+
+```{r}
+
+library(leaflet)
+library(sf)
+library(tidyverse)
+library(USAboundaries)
+library(readxl)
+
+```
+
+```{r message=FALSE, warning=FALSE}
+NID2019_U <- read_excel("~/github/geog-176A-labs/data/NID2019_U.xlsx")
+
+mississippi <- read_sf("~/github/geog-176A-labs/data/MajorRivers") %>% 
+  filter(SYSTEM == "Mississippi")
+```
+
+
+```{r message=FALSE, warning=FALSE}
+
+largest_storage = NID2019_U %>% 
+  filter(HAZARD == "H") %>% 
+  filter(!STATE %in% c("AK", "PR", "HI")) %>% 
+  filter(PURPOSES == "C") %>% 
+  group_by(STATE) %>% 
+  slice_max(NID_STORAGE, n=1)
+
+labels <- largest_storage %>% 
+  select(DAM_NAME, NID_STORAGE, PURPOSES, YEAR_COMPLETED)
+
+
+leaflet() %>% 
+  addProviderTiles(providers$CartoDB) %>% 
+  addCircleMarkers(data = largest_storage, 
+                   color = "red", 
+                   fillOpacity = 0.5, 
+                   stroke = FALSE, 
+                   popup = leafpop::popupTable(labels, feature.id = FALSE, row.numbers = FALSE), 
+                   radius = largest_storage$NID_STORAGE/1500000,
+  ) %>%
+  addPolylines(data = mississippi) 
+
+```
+
