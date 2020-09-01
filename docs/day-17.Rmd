@@ -1,0 +1,32 @@
+---
+title: "Daily Exercise 16"
+author: "Yan Wang"
+output: html_document
+---
+
+```{r message=FALSE, warning=FALSE}
+library(sf)
+library(tidyverse)
+library(elevatr)
+library(rgdal)
+library(readr)
+```
+
+```{r message=FALSE, warning=FALSE}
+uscities <- read_csv("~/github/geog-176A-labs/data/uscities.csv") %>%
+  st_as_sf(coords = c("lng", "lat"), crs = 4326) %>% 
+  filter(city == "Goleta") %>% 
+  st_transform(5070) %>% 
+  st_buffer(5000) %>% 
+  st_bbox() %>% 
+  st_as_sfc() %>% 
+  st_as_sf()
+
+elev = elevatr::get_elev_raster(uscities, z = 11) %>% 
+  raster::crop(uscities)
+plot(elev)
+```
+###Describe the properties:
+```{r}
+elev
+```
