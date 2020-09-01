@@ -7,14 +7,18 @@ library(USAboundaries)
 library(sf)
 library(rmapshaper)
 library(readr)
+library(USAboundariesData)
 
-cities = readr::read_csv("uscities.csv") %>%
+cities = readr::read_csv("data/uscities.csv") %>%
   st_as_sf(coords = c("lng", "lat"), crs = 4326) %>%
   st_transform(5070)
 
 get_conus = function(data, var){
   filter(data, !get(var) %in% c("Hawaii", "Puerto Rico", "Alaska"))
 }
+
+states = st_transform(us_counties(), 5070) %>%
+  get_conus("state_name")
 
 point_in_polygon3 = function(points, polygon, id){
   st_join(polygon, points) %>%
@@ -31,11 +35,11 @@ plot_pip = function(data){
     scale_fill_gradient(low = "white", high = "darkgreen") +
     theme_void() +
     theme(legend.position = 'none',
-          plot.title = element_text(face = "bold", color = "darkgreen", hjust = .5, size = 24)) +
+          plot.title = element_text(face = "bold", color = "darkgreen", hjust = .5, size = 18)) +
     labs(title = "Number of Cities",
          caption = paste0(sum(data$n), " locations represented"))
 }
 
-point_in_polygon3(cities, counties, "geoid") %>%
+point_in_polygon3(cities, states, "geoid") %>%
   plot_pip() %>%
   ggsave(path = "img", filename = "D14.jpg")
