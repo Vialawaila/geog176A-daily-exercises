@@ -10,6 +10,7 @@ library(tidyverse)
 library(elevatr)
 library(rgdal)
 library(readr)
+library(raster)
 ```
 
 ```{r message=FALSE, warning=FALSE}
@@ -30,3 +31,30 @@ plot(elev)
 ```{r}
 elev
 ```
+
+Daily Exercise 17
+
+```{r}
+threshold = function(x) {ifelse(x <= 0 , NA, 1)}
+threshold(100)
+```
+```{r}
+threshold(-100)
+```
+```{r}
+elev2 = calc(elev, threshold)
+plot(elev2, col = viridis::viridis(256))
+```
+
+```{r}
+elev3 = elev * elev2
+plot(elev3, col = viridis::viridis(256))
+```
+```{r}
+rcl = data.frame(min = seq(0,500,100),max =  seq(100,600,100), lab = c(0:5))
+rc = reclassify(elev3, rcl, include.lowest=TRUE)
+s = stack(elev, elev2, elev3, rc) %>% 
+  setNames(c("Elevation", "Mask", "Terrain", "Topography"))
+plot(s, col = viridis::viridis(256))
+```
+
