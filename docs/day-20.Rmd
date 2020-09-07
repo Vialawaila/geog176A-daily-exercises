@@ -1,0 +1,58 @@
+---
+title: "Daily Exercise 20"
+author: "Yan Wang"
+output: html_document
+---
+
+```{r message=FALSE, warning=FALSE}
+library(sf)
+library(tidyverse)
+library(elevatr)
+library(rgdal)
+library(readr)
+library(raster)
+library(osmdata)
+library(leaflet)
+library(climateR)
+```
+
+```{r message=FALSE, warning=FALSE}
+params = c("prcp", "tmax", "tmin", "swe")
+AOI = USAboundaries::us_states() %>% filter(name == "California")
+co = climateR::getTerraClim(AOI, params, startDate = "2018-01-01")  %>% 
+  stack() %>% 
+  setNames(params)
+plot(co)
+```
+
+
+```{r message=FALSE, warning=FALSE}
+values = values(co)
+head(values)
+```
+
+
+```{r message=FALSE, warning=FALSE}
+idx = which(!is.na(values))
+v = na.omit(values)
+vs = scale(v)
+```
+
+
+```{r message=FALSE, warning=FALSE}
+E = kmeans(vs, 5, iter.max = 100)
+E
+```
+
+
+```{r message=FALSE, warning=FALSE}
+clus_raster = co$tmax
+values(clus_raster) = NA
+```
+
+
+```{r message=FALSE, warning=FALSE}
+clus_raster[idx] <- E$cluster
+plot(clus_raster, col = RColorBrewer::brewer.pal(5, "Spectral"))
+```
+

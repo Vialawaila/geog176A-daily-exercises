@@ -1,5 +1,5 @@
 ---
-title: "Daily Exercise 16"
+title: "Daily Exercise 17-19"
 author: "Yan Wang"
 output: html_document
 ---
@@ -11,6 +11,8 @@ library(elevatr)
 library(rgdal)
 library(readr)
 library(raster)
+library(osmdata)
+library(leaflet)
 ```
 
 ```{r message=FALSE, warning=FALSE}
@@ -56,5 +58,26 @@ rc = reclassify(elev3, rcl, include.lowest=TRUE)
 s = stack(elev, elev2, elev3, rc) %>% 
   setNames(c("Elevation", "Mask", "Terrain", "Topography"))
 plot(s, col = viridis::viridis(256))
+```
+
+```{r message=FALSE, warning=FALSE}
+bb  = st_bbox(s) %>% 
+  st_as_sfc() %>% 
+  st_transform(4326)
+osm = osmdata::opq(bb) %>% 
+  add_osm_feature(key = 'amenity', value = "restaurant") %>% 
+  osmdata_sf()
+print(osm)
+```
+```{r message=FALSE, warning=FALSE}
+restaurant = osm$osm_points %>% 
+   filter(name != 'NA')
+restaurant = restaurant %>% 
+   mutate(elevation = raster::extract(elev, restaurant))
+labels = restaurant %>% 
+  dplyr::select(elevation)
+leaflet() %>% 
+  addProviderTiles(providers$CartoDB) %>% 
+  addMarkers(data = restaurant, popup = leafpop::popupTable(st_drop_geometry(labels), feature.id = F, row.numbers = F), label = ~name)
 ```
 
