@@ -1,0 +1,42 @@
+---
+title: "Daily Exercise 20"
+author: "Yan Wang"
+output: html_document
+---
+
+```{r message=FALSE, warning=FALSE}
+library(tidyverse)
+library(sf)
+library(elevatr)
+library(raster)
+library(whitebox)
+```
+
+
+```{r message=FALSE, warning=FALSE}
+mo = AOI::aoi_get("Mount Saint Helens") %>% 
+  AOI::aoi_buffer(.5)
+```
+
+```{r eval=FALSE, message=FALSE, warning=FALSE}
+elev  = elevatr::get_elev_raster(mo, z = 12) %>% 
+  crop(mo)
+
+writeRaster(elev, "../data/mount-saint-helens-elev.tif", overwrite = TRUE)
+
+wbt_slope("../data/mount-saint-helens-elev.tif", "../data/mount-saint-helens-slope.tif")
+wbt_aspect("../data/mount-saint-helens-elev.tif", "../data/mount-saint-helens-aspect.tif")
+wbt_hillshade("../data/mount-saint-helens-elev.tif", "../data/mount-saint-helens-hillshade.tif")
+```
+
+
+```{r eval=TRUE, message=FALSE, warning=FALSE}
+e = raster("../data/mount-saint-helens-elev.tif")
+s = raster("../data/mount-saint-helens-slope.tif")
+a = raster("../data/mount-saint-helens-aspect.tif")
+h = raster("../data/mount-saint-helens-hillshade.tif")
+plot(e, box = FALSE, axes = FALSE, col = viridis::viridis(256), main = "Elevation")
+plot(s, box = FALSE, axes = FALSE, col = terrain.colors(256), main = "Slope")
+plot(a, box = FALSE, axes = FALSE, col = rainbow(8), main = "Aspect")
+plot(h, box = FALSE, axes = FALSE, col = gray.colors(256, alpha = .8), main = "Hillshade")
+```
